@@ -1,0 +1,92 @@
+// The tests for your four functions. You don't need to change this file.
+// Each problem has a test with a big input that is only fast with the right
+// structure. If one of them runs for a long time, that's the test telling you
+// to choose another structure: stop it with Ctrl+C.
+import assert from "node:assert/strict";
+import { test } from "node:test";
+import { bracketsBalanced, countTaken, fewestStops, mostPlayed } from "./pick-the-structure.ts";
+
+const TRACKS: [string, string][] = [["Elm", "Oak"], ["Oak", "Pine"], ["Pine", "Harbor"], ["Elm", "Maple"], ["Maple", "Cedar"], ["Cedar", "Pine"], ["Ferry", "Island"]];
+
+function assertFast(started: number, what: string): void {
+  const seconds = (performance.now() - started) / 1000;
+  assert.ok(seconds < 2, `Not yet: ${what} took ${seconds.toFixed(1)} seconds. With the right structure it takes well under one.`);
+}
+
+test("countTaken counts the names already used", () => {
+  assert.equal(countTaken(["river_fox", "neon_owl"], ["neon_owl", "lemon_bee"]), 1, "Not yet: neon_owl is taken and lemon_bee is free, so 1.");
+  assert.equal(countTaken(["river_fox", "neon_owl"], ["neon_owl", "river_fox", "slow_cat"]), 2, "Not yet: neon_owl and river_fox are both taken.");
+  assert.equal(countTaken([], ["river_fox"]), 0, "Not yet: with nothing taken, no name is taken.");
+});
+
+test("countTaken is fast for 100,000 names", () => {
+  const taken: string[] = [];
+  const wanted: string[] = [];
+  for (let i = 0; i < 100000; i++) {
+    taken.push(`user${i}`);
+    wanted.push(`user${i * 2}`);
+  }
+  const started = performance.now();
+  const count = countTaken(taken, wanted);
+  assert.equal(count, 50000, "Not yet: half of the 100,000 wanted names are taken.");
+  assertFast(started, "checking 100,000 names");
+});
+
+test("mostPlayed finds the top song", () => {
+  assert.equal(mostPlayed(["Slow Rain", "Lemon Skies", "Slow Rain"]), "Slow Rain", "Not yet: Slow Rain was played twice.");
+  assert.equal(mostPlayed(["Midnight Bus", "Lemon Skies"]), "Lemon Skies", "Not yet: a tie goes to the title first from A to Z.");
+  assert.equal(mostPlayed([]), "", "Not yet: with no plays, return an empty string.");
+});
+
+test("mostPlayed is fast for 200,000 plays", () => {
+  const plays: string[] = [];
+  for (let i = 0; i < 200000; i++) {
+    plays.push(`Song ${i % 50000}`);
+  }
+  plays.push("Song 777", "Song 777", "Song 777");
+  const started = performance.now();
+  const top = mostPlayed(plays);
+  assert.equal(top, "Song 777", "Not yet: every song was played 4 times except Song 777, played 7.");
+  assertFast(started, "counting 200,000 plays");
+});
+
+test("fewestStops counts the shortest ride", () => {
+  assert.equal(fewestStops(TRACKS, "Elm", "Harbor"), 3, "Not yet: Elm, Oak, Pine, Harbor is 3 stops.");
+  assert.equal(fewestStops(TRACKS, "Elm", "Cedar"), 2, "Not yet: Elm, Maple, Cedar is 2 stops.");
+  assert.equal(fewestStops(TRACKS, "Elm", "Elm"), 0, "Not yet: a station is 0 stops from itself.");
+  assert.equal(fewestStops(TRACKS, "Elm", "Island"), -1, "Not yet: no tracks join Elm and Island.");
+  assert.equal(fewestStops(TRACKS, "Elm", "Airport"), -1, "Not yet: Airport isn't on the map.");
+});
+
+test("fewestStops is fast on a big map", () => {
+  const grid: [string, string][] = [];
+  for (let row = 0; row < 150; row++) {
+    for (let column = 0; column < 150; column++) {
+      if (column < 149) grid.push([`S${row}-${column}`, `S${row}-${column + 1}`]);
+      if (row < 149) grid.push([`S${row}-${column}`, `S${row + 1}-${column}`]);
+    }
+  }
+  const started = performance.now();
+  const stops = fewestStops(grid, "S0-0", "S149-149");
+  assert.equal(stops, 298, "Not yet: corner to corner of a 150 by 150 grid of stations is 298 stops.");
+  assertFast(started, "a map of 22,500 stations");
+});
+
+test("bracketsBalanced checks every kind", () => {
+  assert.ok(bracketsBalanced("(1 + [2 * 3])"), "Not yet: every bracket here is closed by its own kind, in order.");
+  assert.ok(bracketsBalanced("total = (price * [1 + tax]) - {discount}"), "Not yet: (, [ and { are each closed in the right order.");
+  assert.ok(bracketsBalanced("no brackets"), "Not yet: a line with no brackets is balanced.");
+  assert.ok(!bracketsBalanced("(1 + 2]"), "Not yet: ( is closed by ], the wrong kind.");
+  assert.ok(!bracketsBalanced("(("), "Not yet: two brackets are never closed.");
+  assert.ok(!bracketsBalanced(")("), "Not yet: ) comes before anything it could close.");
+});
+
+test("bracketsBalanced is fast for deep nesting", () => {
+  const deep = "(".repeat(100000) + ")".repeat(100000);
+  const started = performance.now();
+  const balanced = bracketsBalanced(deep);
+  const missingOne = bracketsBalanced(deep.slice(1));
+  assert.ok(balanced, "Not yet: 100,000 ( then 100,000 ) is balanced.");
+  assert.ok(!missingOne, "Not yet: with one ( missing, the last ) has nothing to close.");
+  assertFast(started, "checking 200,000 brackets");
+});

@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="PickTheStructure/PickTheStructure.csproj" />
+  <Project Path="PickTheStructure.Tests/PickTheStructure.Tests.csproj" />
+</Solution>
