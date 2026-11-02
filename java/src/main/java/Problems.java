@@ -1,18 +1,14 @@
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Deque;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
-import java.util.Set;
+// java.util.* brings in every collection you might choose: List, Map, Set, Queue and more.
+import java.util.*;
 
-// Four small problems from apps you use. The comment above each method says
+// Five small problems from apps you use. The comment above each method says
 // what it should return, with examples. Replace each return line with your
 // own code, and write the structure you chose on its Structure: line.
 // Each track is a list of two stations: List.of("Elm", "Oak").
 public class Problems {
+    // One chat message: who sent it, and the second it was sent.
+    public record Message(String sender, int second) {}
+
     /*
      * A sign-up form: how many of the wanted usernames are already taken?
      * The site has up to 100,000 taken names, and checks a name on every
@@ -70,5 +66,23 @@ public class Problems {
      */
     public static boolean bracketsBalanced(String text) {
         return false;
+    }
+
+    /*
+     * A chat room's spam guard. Each message is a sender's name and the
+     * second it was sent, and the messages come in time order. A message
+     * is blocked when its sender already sent 3 or more messages in the 10
+     * seconds before it: at a second greater than this one's minus 10.
+     * Every message counts toward the limit, blocked or not. Return how
+     * many messages are blocked. A busy room sends 200,000 messages an
+     * hour, so this has to stay fast.
+     *
+     * blockedMessages([("Kai", 1), ("Kai", 2), ("Kai", 3), ("Kai", 4)]) -> 1
+     * blockedMessages([("Kai", 1), ("Kai", 2), ("Kai", 3), ("Kai", 11)]) -> 0
+     *
+     * Structure: (write the structure you used, and this function's Big-O)
+     */
+    public static int blockedMessages(List<Message> messages) {
+        return 0;
     }
 }

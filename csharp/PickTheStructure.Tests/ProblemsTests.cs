@@ -3,7 +3,7 @@ using PickTheStructure;
 
 namespace PickTheStructure.Tests;
 
-// The tests for your four methods. You don't need to change this file.
+// The tests for your five methods. You don't need to change this file.
 // Each problem has a test with a big input that is only fast with the right
 // structure. If one of them runs for a long time, that's the test telling you
 // to choose another structure: stop it with Ctrl+C.
@@ -12,6 +12,7 @@ namespace PickTheStructure.Tests;
 public class ProblemsTests
 {
     private static readonly List<(string, string)> Tracks = new List<(string, string)> { ("Elm", "Oak"), ("Oak", "Pine"), ("Pine", "Harbor"), ("Elm", "Maple"), ("Maple", "Cedar"), ("Cedar", "Pine"), ("Ferry", "Island") };
+    private static readonly List<(string, int)> Messages = new List<(string, int)> { ("Kai", 1), ("Kai", 2), ("Mia", 2), ("Kai", 3), ("Kai", 4), ("Kai", 9), ("Kai", 14) };
 
     private static void AssertFast(Stopwatch watch, string what)
     {
@@ -118,5 +119,31 @@ public class ProblemsTests
         Assert.IsTrue(balanced, "Not yet: 100,000 ( then 100,000 ) is balanced.");
         Assert.IsFalse(missingOne, "Not yet: with one ( missing, the last ) has nothing to close.");
         AssertFast(watch, "checking 200,000 brackets");
+    }
+
+    [TestMethod]
+    public void BlockedMessagesCountsEachSendersLast10Seconds()
+    {
+        Assert.AreEqual(1, Problems.BlockedMessages(new List<(string, int)> { ("Kai", 1), ("Kai", 2), ("Kai", 3), ("Kai", 4) }), "Not yet: Kai's 4th message comes after 3 in the 10 seconds before it, so it's blocked.");
+        Assert.AreEqual(0, Problems.BlockedMessages(new List<(string, int)> { ("Kai", 1), ("Kai", 2), ("Kai", 3), ("Kai", 11) }), "Not yet: at second 11, the message from second 1 is 10 seconds back and no longer counts, so only 2 do.");
+        Assert.AreEqual(0, Problems.BlockedMessages(new List<(string, int)> { ("Kai", 1), ("Mia", 1), ("Kai", 2), ("Mia", 2), ("Kai", 3), ("Mia", 3) }), "Not yet: each sender counts only their own messages: 3 each, none blocked.");
+        Assert.AreEqual(2, Problems.BlockedMessages(Messages), "Not yet: Kai's messages at seconds 4 and 9 are blocked.");
+        Assert.AreEqual(0, Problems.BlockedMessages(new List<(string, int)>()), "Not yet: no messages, nothing blocked.");
+    }
+
+    [TestMethod]
+    public void BlockedMessagesIsFastForASpamWave()
+    {
+        // 20 bots each send a message every 3 seconds, 10,000 times: 200,000 messages.
+        List<(string, int)> messages = new List<(string, int)>();
+        for (int i = 0; i < 200000; i++)
+        {
+            messages.Add(("bot" + (i % 20), (i / 20) * 3));
+        }
+        Stopwatch watch = Stopwatch.StartNew();
+        int blocked = Problems.BlockedMessages(messages);
+        watch.Stop();
+        Assert.AreEqual(199940, blocked, "Not yet: from each bot's 4th message on, 3 earlier ones sit in the 10 seconds before it, blocked or not: 199,940 blocked.");
+        AssertFast(watch, "checking 200,000 messages");
     }
 }

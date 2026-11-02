@@ -1,12 +1,13 @@
-# The tests for your four functions. You don't need to change this file.
+# The tests for your five functions. You don't need to change this file.
 # Each problem has a test with a big input that is only fast with the right
 # structure. If one of them runs for a long time, that's the test telling you
 # to choose another structure: stop it with Ctrl+C.
 import time
 
-from pick_the_structure import brackets_balanced, count_taken, fewest_stops, most_played
+from pick_the_structure import blocked_messages, brackets_balanced, count_taken, fewest_stops, most_played
 
 TRACKS = [("Elm", "Oak"), ("Oak", "Pine"), ("Pine", "Harbor"), ("Elm", "Maple"), ("Maple", "Cedar"), ("Cedar", "Pine"), ("Ferry", "Island")]
+MESSAGES = [("Kai", 1), ("Kai", 2), ("Mia", 2), ("Kai", 3), ("Kai", 4), ("Kai", 9), ("Kai", 14)]
 
 
 def assert_fast(started, what):
@@ -82,3 +83,20 @@ def test_brackets_balanced_is_fast_for_deep_nesting():
     assert balanced, "Not yet: 100,000 ( then 100,000 ) is balanced."
     assert not missing_one, "Not yet: with one ( missing, the last ) has nothing to close."
     assert_fast(started, "checking 200,000 brackets")
+
+
+def test_blocked_messages_counts_each_senders_last_10_seconds():
+    assert blocked_messages([("Kai", 1), ("Kai", 2), ("Kai", 3), ("Kai", 4)]) == 1, "Not yet: Kai's 4th message comes after 3 in the 10 seconds before it, so it's blocked."
+    assert blocked_messages([("Kai", 1), ("Kai", 2), ("Kai", 3), ("Kai", 11)]) == 0, "Not yet: at second 11, the message from second 1 is 10 seconds back and no longer counts, so only 2 do."
+    assert blocked_messages([("Kai", 1), ("Mia", 1), ("Kai", 2), ("Mia", 2), ("Kai", 3), ("Mia", 3)]) == 0, "Not yet: each sender counts only their own messages: 3 each, none blocked."
+    assert blocked_messages(MESSAGES) == 2, "Not yet: Kai's messages at seconds 4 and 9 are blocked."
+    assert blocked_messages([]) == 0, "Not yet: no messages, nothing blocked."
+
+
+def test_blocked_messages_is_fast_for_a_spam_wave():
+    # 20 bots each send a message every 3 seconds, 10,000 times: 200,000 messages.
+    messages = [(f"bot{i % 20}", (i // 20) * 3) for i in range(200000)]
+    started = time.perf_counter()
+    blocked = blocked_messages(messages)
+    assert blocked == 199940, "Not yet: from each bot's 4th message on, 3 earlier ones sit in the 10 seconds before it, blocked or not: 199,940 blocked."
+    assert_fast(started, "checking 200,000 messages")

@@ -1,7 +1,6 @@
-# Four small problems from apps you use. The comment under each function says
+# Five small problems from apps you use. The comment under each function says
 # what it should return, with examples. Replace each return line with your
 # own code, and write the structure you chose on its Structure: line.
-from collections import deque
 
 
 def count_taken(taken, wanted):
@@ -61,3 +60,21 @@ def brackets_balanced(text):
     Structure: (write the structure you used, and this function's Big-O)
     """
     return False
+
+
+def blocked_messages(messages):
+    """
+    A chat room's spam guard. Each message is a sender's name and the
+    second it was sent, and the messages come in time order. A message
+    is blocked when its sender already sent 3 or more messages in the 10
+    seconds before it: at a second greater than this one's minus 10.
+    Every message counts toward the limit, blocked or not. Return how
+    many messages are blocked. A busy room sends 200,000 messages an
+    hour, so this has to stay fast.
+
+    blocked_messages([("Kai", 1), ("Kai", 2), ("Kai", 3), ("Kai", 4)]) -> 1
+    blocked_messages([("Kai", 1), ("Kai", 2), ("Kai", 3), ("Kai", 11)]) -> 0
+
+    Structure: (write the structure you used, and this function's Big-O)
+    """
+    return 0

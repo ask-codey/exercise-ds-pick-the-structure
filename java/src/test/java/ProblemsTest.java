@@ -6,12 +6,17 @@ import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
-// The tests for your four methods. You don't need to change this file.
+// The tests for your five methods. You don't need to change this file.
 // Each problem has a test with a big input that is only fast with the right
 // structure. If one of them runs for a long time, that's the test telling you
 // to choose another structure: stop it with Ctrl+C.
 class ProblemsTest {
     private static final List<List<String>> TRACKS = List.of(List.of("Elm", "Oak"), List.of("Oak", "Pine"), List.of("Pine", "Harbor"), List.of("Elm", "Maple"), List.of("Maple", "Cedar"), List.of("Cedar", "Pine"), List.of("Ferry", "Island"));
+    private static final List<Problems.Message> MESSAGES = List.of(m("Kai", 1), m("Kai", 2), m("Mia", 2), m("Kai", 3), m("Kai", 4), m("Kai", 9), m("Kai", 14));
+
+    private static Problems.Message m(String sender, int second) {
+        return new Problems.Message(sender, second);
+    }
 
     private static void assertFast(long started, String what) {
         double seconds = (System.nanoTime() - started) / 1e9;
@@ -102,5 +107,27 @@ class ProblemsTest {
         assertTrue(balanced, "Not yet: 100,000 ( then 100,000 ) is balanced.");
         assertFalse(missingOne, "Not yet: with one ( missing, the last ) has nothing to close.");
         assertFast(started, "checking 200,000 brackets");
+    }
+
+    @Test
+    void blockedMessagesCountsEachSendersLast10Seconds() {
+        assertEquals(1, Problems.blockedMessages(List.of(m("Kai", 1), m("Kai", 2), m("Kai", 3), m("Kai", 4))), "Not yet: Kai's 4th message comes after 3 in the 10 seconds before it, so it's blocked.");
+        assertEquals(0, Problems.blockedMessages(List.of(m("Kai", 1), m("Kai", 2), m("Kai", 3), m("Kai", 11))), "Not yet: at second 11, the message from second 1 is 10 seconds back and no longer counts, so only 2 do.");
+        assertEquals(0, Problems.blockedMessages(List.of(m("Kai", 1), m("Mia", 1), m("Kai", 2), m("Mia", 2), m("Kai", 3), m("Mia", 3))), "Not yet: each sender counts only their own messages: 3 each, none blocked.");
+        assertEquals(2, Problems.blockedMessages(MESSAGES), "Not yet: Kai's messages at seconds 4 and 9 are blocked.");
+        assertEquals(0, Problems.blockedMessages(List.of()), "Not yet: no messages, nothing blocked.");
+    }
+
+    @Test
+    void blockedMessagesIsFastForASpamWave() {
+        // 20 bots each send a message every 3 seconds, 10,000 times: 200,000 messages.
+        List<Problems.Message> messages = new ArrayList<>();
+        for (int i = 0; i < 200000; i++) {
+            messages.add(m("bot" + (i % 20), (i / 20) * 3));
+        }
+        long started = System.nanoTime();
+        int blocked = Problems.blockedMessages(messages);
+        assertEquals(199940, blocked, "Not yet: from each bot's 4th message on, 3 earlier ones sit in the 10 seconds before it, blocked or not: 199,940 blocked.");
+        assertFast(started, "checking 200,000 messages");
     }
 }

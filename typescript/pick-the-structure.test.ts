@@ -1,12 +1,13 @@
-// The tests for your four functions. You don't need to change this file.
+// The tests for your five functions. You don't need to change this file.
 // Each problem has a test with a big input that is only fast with the right
 // structure. If one of them runs for a long time, that's the test telling you
 // to choose another structure: stop it with Ctrl+C.
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { bracketsBalanced, countTaken, fewestStops, mostPlayed } from "./pick-the-structure.ts";
+import { blockedMessages, bracketsBalanced, countTaken, fewestStops, mostPlayed } from "./pick-the-structure.ts";
 
 const TRACKS: [string, string][] = [["Elm", "Oak"], ["Oak", "Pine"], ["Pine", "Harbor"], ["Elm", "Maple"], ["Maple", "Cedar"], ["Cedar", "Pine"], ["Ferry", "Island"]];
+const MESSAGES: [string, number][] = [["Kai", 1], ["Kai", 2], ["Mia", 2], ["Kai", 3], ["Kai", 4], ["Kai", 9], ["Kai", 14]];
 
 function assertFast(started: number, what: string): void {
   const seconds = (performance.now() - started) / 1000;
@@ -89,4 +90,24 @@ test("bracketsBalanced is fast for deep nesting", () => {
   assert.ok(balanced, "Not yet: 100,000 ( then 100,000 ) is balanced.");
   assert.ok(!missingOne, "Not yet: with one ( missing, the last ) has nothing to close.");
   assertFast(started, "checking 200,000 brackets");
+});
+
+test("blockedMessages counts each sender's last 10 seconds", () => {
+  assert.equal(blockedMessages([["Kai", 1], ["Kai", 2], ["Kai", 3], ["Kai", 4]]), 1, "Not yet: Kai's 4th message comes after 3 in the 10 seconds before it, so it's blocked.");
+  assert.equal(blockedMessages([["Kai", 1], ["Kai", 2], ["Kai", 3], ["Kai", 11]]), 0, "Not yet: at second 11, the message from second 1 is 10 seconds back and no longer counts, so only 2 do.");
+  assert.equal(blockedMessages([["Kai", 1], ["Mia", 1], ["Kai", 2], ["Mia", 2], ["Kai", 3], ["Mia", 3]]), 0, "Not yet: each sender counts only their own messages: 3 each, none blocked.");
+  assert.equal(blockedMessages(MESSAGES), 2, "Not yet: Kai's messages at seconds 4 and 9 are blocked.");
+  assert.equal(blockedMessages([]), 0, "Not yet: no messages, nothing blocked.");
+});
+
+test("blockedMessages is fast for a spam wave", () => {
+  // 20 bots each send a message every 3 seconds, 10,000 times: 200,000 messages.
+  const messages: [string, number][] = [];
+  for (let i = 0; i < 200000; i++) {
+    messages.push([`bot${i % 20}`, Math.floor(i / 20) * 3]);
+  }
+  const started = performance.now();
+  const blocked = blockedMessages(messages);
+  assert.equal(blocked, 199940, "Not yet: from each bot's 4th message on, 3 earlier ones sit in the 10 seconds before it, blocked or not: 199,940 blocked.");
+  assertFast(started, "checking 200,000 messages");
 });
