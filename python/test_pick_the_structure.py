@@ -94,9 +94,9 @@ def test_blocked_messages_counts_each_senders_last_10_seconds():
 
 
 def test_blocked_messages_is_fast_for_a_spam_wave():
-    # 20 bots each send a message every 3 seconds, 10,000 times: 200,000 messages.
-    messages = [(f"bot{i % 20}", (i // 20) * 3) for i in range(200000)]
+    # 20 bots each send a message every 3 seconds, 40,000 times: 800,000 messages.
+    messages = [(f"bot{i % 20}", (i // 20) * 3) for i in range(800000)]
     started = time.perf_counter()
     blocked = blocked_messages(messages)
-    assert blocked == 199940, "Not yet: from each bot's 4th message on, 3 earlier ones sit in the 10 seconds before it, blocked or not: 199,940 blocked."
-    assert_fast(started, "checking 200,000 messages")
+    assert blocked == 799940, "Not yet: from each bot's 4th message on, 3 earlier ones sit in the 10 seconds before it, blocked or not: 799,940 blocked."
+    assert_fast(started, "checking 800,000 messages")

@@ -120,14 +120,14 @@ class ProblemsTest {
 
     @Test
     void blockedMessagesIsFastForASpamWave() {
-        // 20 bots each send a message every 3 seconds, 10,000 times: 200,000 messages.
+        // 20 bots each send a message every 3 seconds, 40,000 times: 800,000 messages.
         List<Problems.Message> messages = new ArrayList<>();
-        for (int i = 0; i < 200000; i++) {
+        for (int i = 0; i < 800000; i++) {
             messages.add(m("bot" + (i % 20), (i / 20) * 3));
         }
         long started = System.nanoTime();
         int blocked = Problems.blockedMessages(messages);
-        assertEquals(199940, blocked, "Not yet: from each bot's 4th message on, 3 earlier ones sit in the 10 seconds before it, blocked or not: 199,940 blocked.");
-        assertFast(started, "checking 200,000 messages");
+        assertEquals(799940, blocked, "Not yet: from each bot's 4th message on, 3 earlier ones sit in the 10 seconds before it, blocked or not: 799,940 blocked.");
+        assertFast(started, "checking 800,000 messages");
     }
 }

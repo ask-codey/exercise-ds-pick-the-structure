@@ -134,16 +134,16 @@ public class ProblemsTests
     [TestMethod]
     public void BlockedMessagesIsFastForASpamWave()
     {
-        // 20 bots each send a message every 3 seconds, 10,000 times: 200,000 messages.
+        // 20 bots each send a message every 3 seconds, 40,000 times: 800,000 messages.
         List<(string, int)> messages = new List<(string, int)>();
-        for (int i = 0; i < 200000; i++)
+        for (int i = 0; i < 800000; i++)
         {
             messages.Add(("bot" + (i % 20), (i / 20) * 3));
         }
         Stopwatch watch = Stopwatch.StartNew();
         int blocked = Problems.BlockedMessages(messages);
         watch.Stop();
-        Assert.AreEqual(199940, blocked, "Not yet: from each bot's 4th message on, 3 earlier ones sit in the 10 seconds before it, blocked or not: 199,940 blocked.");
-        AssertFast(watch, "checking 200,000 messages");
+        Assert.AreEqual(799940, blocked, "Not yet: from each bot's 4th message on, 3 earlier ones sit in the 10 seconds before it, blocked or not: 799,940 blocked.");
+        AssertFast(watch, "checking 800,000 messages");
     }
 }

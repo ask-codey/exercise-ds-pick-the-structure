@@ -10,7 +10,7 @@ Five tickets from apps you use. Each one is quick to get right on a small input,
 > 2. **Music app:** "Show a 'most played' badge: the title played the most times, ties going to the title first from A to Z. A busy day is 200,000 plays."
 > 3. **Subway app:** "Show the fewest stops between two stations. Each track joins two neighboring stations, and the new map has 22,500 stations."
 > 4. **Code editor:** "Warn when the brackets in a line don't match: every `(`, `[` and `{` closed by the same kind, in the right order. Some generated files nest 100,000 deep."
-> 5. **Chat room:** "Block spam. A message is blocked when its sender already sent 3 or more messages in the 10 seconds before it, and every message counts, blocked or not. Count the blocked ones. A spam wave is 200,000 messages."
+> 5. **Chat room:** "Block spam. A message is blocked when its sender already sent 3 or more messages in the 10 seconds before it, and every message counts, blocked or not. Count the blocked ones. A spam wave is 800,000 messages."
 
 The functions, one per ticket:
 
@@ -112,7 +112,7 @@ Open this once your tests are green.
 - **Most played:** sorting the 200,000 plays first works in O(n log n); a dictionary of counts does it in one pass, O(n). Scanning a list of titles for each play is O(n × titles), 10 billion steps with 50,000 titles.
 - **Fewest stops:** trying every route is exponential, and a depth-first walk finds *a* route, not the fewest. Breadth-first search visits each of the 22,500 stations once, O(V + E).
 - **Brackets:** counting brackets can't tell `(]` from `()`. A stack checks each bracket once, O(n), and never runs out of call stack.
-- **Spam guard:** checking every earlier message for each new one is O(n²): with 200,000 messages it took 94 seconds in C#, and ran more than 4 minutes in Python before we stopped it. Keeping each sender's whole history and counting it every time is better, but still slow when a sender has thousands of messages: 27 seconds in Python, 1.7 in C#. A queue per sender holds only the last 10 seconds, and each second joins and leaves it once, O(n): under a tenth of a second in both.
+- **Spam guard:** checking every earlier message for each new one is O(n²): with 800,000 messages it ran more than 10 minutes in every language before we stopped it. Keeping each sender's whole history and counting it every time is better, but still slow when each sender has tens of thousands of messages: 9 seconds in JavaScript and TypeScript, 35 in C#, 75 in Java and 9 minutes in Python. A queue per sender holds only the last 10 seconds, and each second joins and leaves it once, O(n): under a fifth of a second in every language.
 
 </details>
 

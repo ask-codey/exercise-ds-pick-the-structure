@@ -101,13 +101,13 @@ test("blockedMessages counts each sender's last 10 seconds", () => {
 });
 
 test("blockedMessages is fast for a spam wave", () => {
-  // 20 bots each send a message every 3 seconds, 10,000 times: 200,000 messages.
+  // 20 bots each send a message every 3 seconds, 40,000 times: 800,000 messages.
   const messages: [string, number][] = [];
-  for (let i = 0; i < 200000; i++) {
+  for (let i = 0; i < 800000; i++) {
     messages.push([`bot${i % 20}`, Math.floor(i / 20) * 3]);
   }
   const started = performance.now();
   const blocked = blockedMessages(messages);
-  assert.equal(blocked, 199940, "Not yet: from each bot's 4th message on, 3 earlier ones sit in the 10 seconds before it, blocked or not: 199,940 blocked.");
-  assertFast(started, "checking 200,000 messages");
+  assert.equal(blocked, 799940, "Not yet: from each bot's 4th message on, 3 earlier ones sit in the 10 seconds before it, blocked or not: 799,940 blocked.");
+  assertFast(started, "checking 800,000 messages");
 });

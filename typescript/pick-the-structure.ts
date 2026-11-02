@@ -67,7 +67,7 @@ export function bracketsBalanced(text: string): boolean {
  * is blocked when its sender already sent 3 or more messages in the 10
  * seconds before it: at a second greater than this one's minus 10.
  * Every message counts toward the limit, blocked or not. Return how
- * many messages are blocked. A busy room sends 200,000 messages an
+ * many messages are blocked. A busy room sends 800,000 messages an
  * hour, so this has to stay fast.
  *
  * blockedMessages([["Kai", 1], ["Kai", 2], ["Kai", 3], ["Kai", 4]]) -> 1
